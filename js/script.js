@@ -55,7 +55,7 @@ function formSerialize(form) {
 		result[input.name] = input.value;
 	})
 	result[descr.name] = descr.value;
-	
+
 	return result;
 }
 
@@ -112,7 +112,7 @@ function createCardCat(dataCat) {
 	const cardRate = newCardElement.querySelector('.cat__rate');
 	const cardButtonDelete = newCardElement.querySelector('.cat__delete');
 	const cardButtonEdit = newCardElement.querySelector('.cat__edit');
-	
+
 
 	cardImage.src = dataCat.img_link;
 	cardImage.dataset.id = dataCat.id;
@@ -140,35 +140,37 @@ function createCardCat(dataCat) {
 
 		openPopup(popupEditCats);
 	}
-	
+
 	function handleClickButtonDelete(e) {
 		e.stopPropagation();
-		fetch(`https://sb-cats.herokuapp.com/api/delete/${dataCat.id}`, {
-				method: "DELETE"
-			})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
-				}
+		if (confirm('Вы удаляете котика')) {
+			fetch(`https://sb-cats.herokuapp.com/api/delete/${dataCat.id}`, {
+					method: "DELETE"
+				})
+				.then((response) => {
+					if (response.ok) {
+						return response.json();
+					}
 
-				return Promise.reject(response)
-			})
-			.then((data) => {
+					return Promise.reject(response)
+				})
+				.then((data) => {
 
-				if (data.message === 'ok') {
-					newCardElement.remove();
-					const oldData = getLocalStorageData('cats');
-					const newData = oldData.filter(item => item.id !== dataCat.id);
-					setLocalStorageData('cats', newData)
-				}
+					if (data.message === 'ok') {
+						newCardElement.remove();
+						const oldData = getLocalStorageData('cats');
+						const newData = oldData.filter(item => item.id !== dataCat.id);
+						setLocalStorageData('cats', newData)
+					}
 
-			})
+				})
+		}
 	}
 
 	cardButtonEdit.addEventListener('click', handleClickCatEdit);
-	
+
 	cardButtonDelete.addEventListener('click', handleClickButtonDelete)
-	
+
 	newCardElement.addEventListener('click', handleClickCatImage);
 
 	return newCardElement;
@@ -298,13 +300,11 @@ buttonReloadData.addEventListener('click', reloadData)
 
 //check the localStorage
 
-if(localStorage.getItem('cats')){
+if (localStorage.getItem('cats')) {
 	let catS = JSON.parse(localStorage.getItem('cats'))
 	catS.forEach((dataCat) => {
 		cardAddtoContainer(createCardCat(dataCat), cardListContainer)
 	})
-}else{
+} else {
 	getCats();
 }
-
-
